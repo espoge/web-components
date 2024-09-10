@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Component Attributes</title>
+    <style>
+      .card-title {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <my-paragraph title="My Title" description="My Description" />
+    <script>
+      const template = `
+        <style>
+          .card {
+            border: 1px solid black;
+            padding: 10px;
+            border-radius: 5px;
+            width: fit-content;
+          }
+            .card-title {
+                color: green;
+              }
+        </style>
+        <div class="card">
+        <h2 class="card-title" id="title"></h2>
+        <p id="description"></p>
+        </div>
+      `;
+      class Paragraph extends HTMLElement {
+        static get observedAttributes() {
+          return ["title", "description"];
+        }
+        constructor() {
+          super();
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.innerHTML = template;
+        }
+
+        connectedCallback() {
+          this._rendering();
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          this._rendering();
+        }
+
+        _rendering() {
+          const title = this.getAttribute("title");
+          this.shadowRoot.getElementById("title").textContent = title;
+          const description = this.getAttribute("description");
+          this.shadowRoot.getElementById("description").textContent =
+            description;
+        }
+      }
+      customElements.define("my-paragraph", Paragraph);
+    </script>
+  </body>
+</html>
