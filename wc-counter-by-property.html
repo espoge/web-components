@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Component counter</title>
+  </head>
+  <body>
+    <my-counter id="counter-one"></my-counter>
+    <my-counter id="counter-two"></my-counter>
+
+    <script>
+      const template = (value) => {
+        return `
+        <style>
+          .main-wrapper {
+            display: flex;
+            border: 1px solid black;
+            padding: 10px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+          }
+            .counter-value {
+              font-size: 50px;
+              font-weight: bold;
+            }
+          .button-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 10px
+          }
+            button {
+              padding: 10px;
+              font-size: 20px;
+              border-radius: 5px;}
+          </style>
+        <div class="main-wrapper">
+          <p class="counter-value">${value}</p>
+          <div class="button-wrapper">
+            <button class="decrement-button">-1</button>
+            <button class="increment-button">+1</button>
+          </div>
+        </div>
+      `;
+      };
+      class Counter extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.innerHTML = template(this._value);
+
+          this.updateValue = () => {
+            this.shadowRoot.querySelector(".counter-value").textContent =
+              this._value;
+          };
+          this.incrementValue = () => {
+            this._value++;
+            this.updateValue();
+          };
+          this.decrementValue = () => {
+            this._value--;
+            this.updateValue();
+          };
+          this.shadowRoot
+            .querySelector(".increment-button")
+            .addEventListener("click", this.incrementValue);
+
+          this.shadowRoot
+            .querySelector(".decrement-button")
+            .addEventListener("click", this.decrementValue);
+        }
+
+        set counter(value) {
+          this._value = value;
+          this.updateValue();
+        }
+      }
+      customElements.define("my-counter", Counter);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const counterOne = document.getElementById("counter-one");
+        counterOne.counter = 10;
+
+        const counterTwo = document.getElementById("counter-two");
+        counterTwo.counter = 20;
+      });
+    </script>
+  </body>
+</html>
