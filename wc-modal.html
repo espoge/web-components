@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Component Modal</title>
+    <style>
+      .card-title {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <my-modal id="my-modal">
+      <div slot="body">I'm a modal body</div>
+    </my-modal>
+    <button type="button" id="openModal">Open</button>
+    <script>
+      const template = `
+        <style>
+          .modal-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+          }
+          .modal {
+            width: 500px;
+            height: 300px;
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            border: 1px solid black;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1;
+            background-color: white;
+          }
+      .d-block {
+        display: block;
+        }
+      .d-none {
+        display: none;
+      }
+        #closeModal {
+          position: absolute;
+          top: 10x;
+          right: 10px;
+        }
+        </style>
+        <div class="modal-bg d-none"></div>
+        <div class="modal d-none">
+          <button type="button" id="closeModal">x</button>
+          <slot name="body"></slot>
+
+        </div>
+      `;
+
+      class Modal extends HTMLElement {
+        constructor() {
+          super();
+          this._visibility = false;
+          this.attachShadow({ mode: "open" });
+          this.shadowRoot.innerHTML = template;
+          this.modal = this.shadowRoot.querySelector(".modal");
+          this.modalBg = this.shadowRoot.querySelector(".modal-bg");
+
+          this.shadowRoot
+            .querySelector("#closeModal")
+            .addEventListener("click", () => {
+              this.close();
+            });
+        }
+        close() {
+          this.modal.classList.add("d-none");
+          this.modal.classList.remove("d-block");
+          this.modalBg.classList.add("d-none");
+          this.modalBg.classList.remove("d-block");
+        }
+        open() {
+          this.modal.classList.add("d-block");
+          this.modal.classList.remove("d-none");
+          this.modalBg.classList.add("d-block");
+          this.modalBg.classList.remove("d-none");
+        }
+
+        set visibility(value) {
+          if (value) {
+            this.open();
+          } else {
+            this.close();
+          }
+        }
+      }
+      customElements.define("my-modal", Modal);
+      const myModal = document.getElementById("my-modal");
+
+      document.getElementById("openModal").addEventListener("click", () => {
+        myModal.visibility = true;
+      });
+    </script>
+  </body>
+</html>
